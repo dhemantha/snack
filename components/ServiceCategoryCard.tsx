@@ -8,10 +8,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 interface ServiceCategoryCardProps {
   category: ServiceCategory;
   onPress: (category: ServiceCategory) => void;
+  compact?: boolean;
 }
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width - 60) / 2; // 2 columns with padding
 
 const iconMap = {
   wrench: Wrench,
@@ -24,11 +24,17 @@ const iconMap = {
   car: Car,
 };
 
-export const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({ category, onPress }) => {
+export const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({ 
+  category, 
+  onPress, 
+  compact = false 
+}) => {
   const IconComponent = iconMap[category.icon as keyof typeof iconMap];
+  
+  const cardWidth = compact ? width - 40 : (width - 60) / 2;
 
-  const getGradientColors = (color: string) => {
-    const gradients: { [key: string]: string[] } = {
+  const getGradientColors = (color: string): [string, string] => {
+    const gradients: { [key: string]: [string, string] } = {
       '#3366FF': ['#667EEA', '#764BA2'],
       '#FFAA00': ['#FFD700', '#FF8C00'],
       '#8B4513': ['#D2691E', '#8B4513'],
@@ -40,6 +46,34 @@ export const ServiceCategoryCard: React.FC<ServiceCategoryCardProps> = ({ catego
     };
     return gradients[color] || [color, color];
   };
+
+  if (compact) {
+    return (
+      <TouchableOpacity 
+        onPress={() => onPress(category)}
+        style={[styles.compactContainer, { width: cardWidth }]}
+      >
+        <Card style={styles.compactCard}>
+          <LinearGradient
+            colors={getGradientColors(category.color)}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.compactGradient}
+          >
+            <View style={styles.compactContent}>
+              <View style={styles.compactIconContainer}>
+                <IconComponent size={20} color="white" strokeWidth={2.5} />
+              </View>
+              <View style={styles.compactTextContainer}>
+                <Text style={styles.compactName}>{category.name}</Text>
+                <Text style={styles.compactCount}>{category.count} available</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </Card>
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <TouchableOpacity 
@@ -111,6 +145,51 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     opacity: 0.9,
+    fontWeight: '500',
+  },
+  
+  compactContainer: {
+    marginBottom: 8,
+  },
+  compactCard: {
+    borderRadius: 14,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  compactGradient: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  compactContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  compactIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  compactTextContainer: {
+    flex: 1,
+  },
+  compactName: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  compactCount: {
+    color: 'white',
+    fontSize: 11,
+    opacity: 0.85,
     fontWeight: '500',
   },
 });

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
-import { Layout, Text, Input, Card, Avatar } from '@ui-kitten/components';
-import { Search, MapPin, Star, TrendingUp, Zap, Clock, ArrowRight } from 'lucide-react-native';
+import { Layout, Text, Input, Card } from '@ui-kitten/components';
+import { Search, MapPin, Star, TrendingUp, Zap, ArrowRight } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ServiceCategoryCard } from '@/components/ServiceCategoryCard';
 import { ProviderCard } from '@/components/ProviderCard';
-import { serviceCategories, featuredProviders } from '@/data/mockData';
+import { serviceCategories, featuredProviders, allProviders } from '@/data/mockData';
 import { ServiceCategory, ServiceProvider } from '@/types';
 
 const { width } = Dimensions.get('window');
@@ -44,7 +44,7 @@ export default function HomeScreen() {
           <View style={styles.header}>
             <View style={styles.locationContainer}>
               <MapPin size={16} color="white" />
-              <Text style={styles.locationText}>New York, NYy</Text>
+              <Text style={styles.locationText}>New York, NY</Text>
             </View>
             <Text style={styles.welcomeText}>Find Your Perfect</Text>
             <Text style={styles.titleText}>Service Provider</Text>
@@ -85,12 +85,13 @@ export default function HomeScreen() {
               <ArrowRight size={16} color="#4DA6F2" />
             </TouchableOpacity>
           </View>
-          <View style={styles.categoriesGrid}>
-            {serviceCategories.slice(0, 6).map((category) => (
+          <View style={styles.categoriesContainer}>
+            {serviceCategories.slice(0, 4).map((category) => (
               <ServiceCategoryCard
                 key={category.id}
                 category={category}
                 onPress={handleCategoryPress}
+                compact={true}
               />
             ))}
           </View>
@@ -122,49 +123,26 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* Emergency Service Banner */}
-        <TouchableOpacity style={styles.emergencyBanner}>
-          <LinearGradient
-            colors={['#EF2626', '#F24D4D']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.emergencyGradient}
-          >
-            <View style={styles.emergencyContent}>
-              <View style={styles.emergencyIcon}>
-                <Zap size={24} color="white" />
-              </View>
-              <View style={styles.emergencyText}>
-                <Text style={styles.emergencyTitle}>Emergency Service</Text>
-                <Text style={styles.emergencySubtitle}>24/7 Available • Fast Response</Text>
-              </View>
-              <ArrowRight size={20} color="white" />
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-
-        {/* Recent Activity */}
+        {/* All Providers */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <Card style={styles.activityCard}>
-            <View style={styles.activityItem}>
-              <Avatar
-                source={{ uri: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400' }}
-                size="small"
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Available Providers</Text>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <Text style={styles.seeAllText}>View All</Text>
+              <ArrowRight size={16} color="#4DA6F2" />
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.providersListContainer}>
+            {featuredProviders.concat(allProviders).slice(0, 5).map((provider) => (
+              <ProviderCard
+                key={provider.id}
+                provider={provider}
+                onPress={handleProviderPress}
+                compact={false}
               />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityText}>Mike Johnson completed your plumbing service</Text>
-                <View style={styles.activityMeta}>
-                  <Clock size={12} color="#64748B" />
-                  <Text style={styles.activityTime}>2 hours ago</Text>
-                </View>
-              </View>
-              <View style={styles.activityRating}>
-                <Star size={14} color="#FFD700" fill="#FFD700" />
-                <Text style={styles.ratingText}>4.9</Text>
-              </View>
-            </View>
-          </Card>
+            ))}
+          </View>
         </View>
 
         <View style={styles.bottomSpacing} />
@@ -265,7 +243,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -292,86 +270,16 @@ const styles = StyleSheet.create({
   categoriesGrid: {
     paddingHorizontal: 20,
   },
+  categoriesContainer: {
+    paddingHorizontal: 20,
+    gap: 6,
+  },
   providersContainer: {
     paddingLeft: 20,
   },
-  emergencyBanner: {
-    marginHorizontal: 20,
-    marginBottom: 32,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  emergencyGradient: {
-    padding: 20,
-  },
-  emergencyContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  emergencyIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  emergencyText: {
-    flex: 1,
-  },
-  emergencyTitle: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  emergencySubtitle: {
-    color: 'white',
-    fontSize: 14,
-    opacity: 0.9,
-  },
-  activityCard: {
-    marginHorizontal: 20,
-    borderRadius: 16,
-    padding: 16,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  activityContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  activityText: {
-    fontSize: 14,
-    color: '#1E293B',
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  activityMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: '#64748B',
-  },
-  activityRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: '#FFF4E8',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  ratingText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FF9A26',
+  providersListContainer: {
+    paddingHorizontal: 20,
+    gap: 12,
   },
   bottomSpacing: {
     height: 100,
